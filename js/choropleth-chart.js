@@ -8,12 +8,15 @@ async function createDrugTestChoropleth(containerId, data) {
     d3.select(`#${containerId}`).selectAll('svg').remove();
     const { geoData, jurisdictionTotals } = data;
     
-    // Get fixed milestones
-    const milestones = await getFixedMilestones();
+    // 7 milestones for color and legend
+    const milestones = [0, 5000, 15000, 50000, 100000, 120000, 150000];
+    const colorScale = d3.scaleThreshold()
+        .domain(milestones.slice(1))
+        .range(d3.schemeBlues[7]);
 
     // Set up the dimensions and margins
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-    const width = 800 - margin.left - margin.right;
+    const width = 1200 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
     
     // Create the SVG container
@@ -30,11 +33,6 @@ async function createDrugTestChoropleth(containerId, data) {
     
     // Create the path generator
     const path = d3.geoPath().projection(projection);
-    
-    // Create a color scale with fixed milestones
-    const colorScale = d3.scaleThreshold()
-        .domain(milestones.slice(1))
-        .range(d3.schemeBlues[7]);
     
     // Add the states (filled polygons, thin stroke matching fill color)
     svg.selectAll("path.state")
@@ -96,15 +94,9 @@ async function createDrugTestChoropleth(containerId, data) {
         .style("pointer-events", "none");
 }
 
-// Helper to get fixed milestones from the full CSV data
-async function getFixedMilestones() {
-    // 7 milestones for color and legend
-    const milestones = [0, 5000, 15000, 50000, 100000, 120000, 150000];
-    return milestones;
-}
-
 // Render the legend only once
 function renderChoroplethLegend() {
+    console.log("Rendering legend", document.getElementById('choropleth-legend'));
     d3.select('#choropleth-legend').selectAll('*').remove();
     const legendWidth = 600;
     const legendHeight = 40;
