@@ -1,0 +1,47 @@
+/* Choropleth chart styles */
+.chart-container {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#choropleth-chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.tooltip {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.legend text {
+    font-size: 10px;
+    fill: #666;
+}
+
+.legend rect {
+    stroke: none;
+}
+
+.year-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#choropleth-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px auto 0 auto;
+    width: fit-content;
+}

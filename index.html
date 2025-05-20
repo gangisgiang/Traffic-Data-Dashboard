@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australian Drug Testing Data Visualization</title>
+    
+    <!-- Add CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Add D3.js and TopoJSON -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Australian Drug Testing Data Visualization</h1>
+        </header>
+        
+        <main>
+            <!-- Year Selector (move to top) -->
+            <div class="year-selector" style="margin-bottom: 20px;">
+                <label for="year-slider"><strong>Select Year:</strong></label>
+                <input type="range" id="year-slider">
+                <span id="year-value"></span>
+            </div>
+            <!-- Choropleth Chart Section -->
+            <section class="chart-container">
+                <h2>Total Drug Tests by Jurisdiction</h2>
+                <div id="choropleth-chart"></div>
+                <!-- Legend below the map -->
+                <div id="choropleth-legend" style="margin-top: 30px;"></div>
+            </section>
+            
+            <!-- Additional charts can be added here -->
+        </main>
+        
+        <footer>
+            <p>Data source: Australian Drug Testing Statistics</p>
+        </footer>
+    </div>
+
+    <!-- Add your JavaScript files -->
+    <script type="module">
+        import { loadDrugTestChoroplethData } from './js/loaded-data.js';
+        import { createDrugTestChoropleth, renderChoroplethLegend } from './js/choropleth-chart.js';
+        
+        // Helper to get all years from the CSV
+        async function getAllYears() {
+            const drugTestData = await d3.csv("data/total-drug-test.csv");
+            const years = Array.from(new Set(drugTestData.map(d => d.YEAR))).sort();
+            return years;
+        }
+        
+        // Populate year slider and set up event listener
+        async function setupYearSlider() {
+            const years = await getAllYears();
+            const yearSlider = document.getElementById('year-slider');
+            const yearValue = document.getElementById('year-value');
+            yearSlider.min = Math.min(...years);
+            yearSlider.max = Math.max(...years);
+            yearSlider.step = 1;
+            yearSlider.value = years[0];
+            yearValue.textContent = years[0];
+            // Store years array for mapping slider value to available years
+            yearSlider.years = years;
+        }
+        
+        // Draw or redraw the choropleth chart for a given year
+        async function drawChoroplethForYear(year) {
+            // Remove previous chart
+            const chartDiv = document.getElementById('choropleth-chart');
+            chartDiv.innerHTML = '';
+            // Load and draw
+            const data = await loadDrugTestChoroplethData(year);
+            createDrugTestChoropleth('choropleth-chart', data);
+        }
+        
+        // Initialize everything
+        async function initializeChoropleth() {
+            await setupYearSlider();
+            const yearSlider = document.getElementById('year-slider');
+            const yearValue = document.getElementById('year-value');
+            // Draw initial chart for the first year
+            await drawChoroplethForYear(yearSlider.value);
+            // Redraw chart when year changes
+            yearSlider.addEventListener('input', async (e) => {
+                yearValue.textContent = e.target.value;
+                await drawChoroplethForYear(e.target.value);
+            });
+            // Render the legend after everything is set up
+            renderChoroplethLegend();
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeChoropleth);
+    </script>
+</body>
+</html>
