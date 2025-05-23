@@ -51,7 +51,7 @@ window.renderChoropleth = function(data, geoData) {
     };
   
     // Setup color scale
-    const colorScale = d3.scaleSequential(d3.interpolateBlues);
+    const colorScale = d3.scaleSequential(t => d3.interpolateBlues(0.2 + 0.8 * t));
   
     // SVG for the map
     const svg = container.append("svg")
@@ -89,6 +89,30 @@ window.renderChoropleth = function(data, geoData) {
           return val ? colorScale(val) : "#ccc";
         })
         .attr("stroke", "#fff");
+  
+      // Add jurisdiction labels to the map
+      g.selectAll("text")
+        .data(geoData.features)
+        .enter()
+        .append("text")
+        .attr("x", d => {
+          const centroid = path.centroid(d);
+          return centroid[0];
+        })
+        .attr("y", d => {
+          const centroid = path.centroid(d);
+          return centroid[1];
+        })
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", "12px")
+        .attr("font-family", "Roboto, Arial, sans-serif")
+        .attr("font-weight", 400)
+        .attr("stroke","#000")
+        .attr("fill", "#fff")
+        .attr("stroke-width", 2)
+        .attr("paint-order", "stroke")
+        .text(d => stateNameToCode[d.properties.STATE_NAME] || d.properties.STATE_NAME);
     };
   
     // Initial draw
