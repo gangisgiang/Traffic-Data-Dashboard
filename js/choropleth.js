@@ -146,11 +146,15 @@ window.renderChoropleth = function(data, geoData) {
       .style("fill", "url(#legend-gradient)");
   
     const legendScale = d3.scaleLinear()
-      .domain(colorScale.domain())
-      .range([0, legendWidth]);
+      .domain([0, 170000])
+      .range([0, legendWidth]);    
   
     legendG.append("g")
       .attr("transform", `translate(0,${legendHeight})`)
-      .call(d3.axisBottom(legendScale).ticks(5));
+      .call(d3.axisBottom(legendScale)
+        .tickValues([0, 20000, 50000, 100000, 150000])
+        .tickFormat(d3.format(","))
+      );
+    
   };
   
