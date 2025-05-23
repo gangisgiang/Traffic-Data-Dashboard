@@ -1,7 +1,7 @@
 window.renderChoropleth = function(data, geoData) {
-    const margin = { top: 50, right: 30, bottom: 50, left: 30 };
-    const width = 900 - margin.left - margin.right;
-    const height = 600 - margin.top - margin.bottom; // Increased height
+    const margin = { top: 60, right: 40, bottom: 60, left: 40 };
+    const width = 1200 - margin.left - margin.right;
+    const height = 800 - margin.top - margin.bottom;
   
     const container = d3.select("#choropleth");
     container.html(""); // clear previous
@@ -101,7 +101,7 @@ window.renderChoropleth = function(data, geoData) {
       .attr("width", legendWidth + 40)
       .attr("height", 50)
       .style("display", "block")
-      .style("margin", "20px auto 0 auto");
+      .style("margin", "0 auto 0 auto");
   
     const legendG = legendSvg.append("g")
       .attr("transform", "translate(20,0)");
