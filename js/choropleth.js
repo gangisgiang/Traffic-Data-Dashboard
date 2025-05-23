@@ -1,43 +1,132 @@
-// js/choropleth.js
-function drawChoropleth(year = "2008") {
-    const width = 800;
-    const height = 500;
+window.renderChoropleth = function(data, geoData) {
+    const margin = { top: 50, right: 30, bottom: 50, left: 30 };
+    const width = 900 - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom; // Increased height
   
-    const svg = d3.select("#choropleth")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height);
+    const container = d3.select("#choropleth");
+    container.html(""); // clear previous
   
-    const projection = d3.geoMercator()
-      .fitSize([width, height], window.ausGeoJSON);
+    // Slider (above the map)
+    const slider = container.append("div")
+      .style("margin", "0 auto 20px auto")
+      .style("width", "350px")
+      .style("text-align", "center");
   
+    slider.append("label")
+      .attr("for", "year-slider")
+      .style("margin-right", "10px")
+      .text("Year:");
+  
+    const years = Array.from(new Set(data.map(d => d.YEAR))).sort();
+    let currentYear = years[0];
+  
+    slider.append("input")
+      .attr("type", "range")
+      .attr("id", "year-slider")
+      .attr("min", 0)
+      .attr("max", years.length - 1)
+      .attr("value", 0)
+      .style("width", "200px")
+      .on("input", function() {
+        const index = +this.value;
+        updateMap(years[index]);
+        d3.select("#slider-year-label").text(years[index]);
+      });
+  
+    slider.append("span")
+      .attr("id", "slider-year-label")
+      .style("margin-left", "10px")
+      .text(currentYear);
+  
+    // Map from full state name to code
+    const stateNameToCode = {
+      'New South Wales': 'NSW',
+      'Victoria': 'VIC',
+      'Queensland': 'QLD',
+      'South Australia': 'SA',
+      'Western Australia': 'WA',
+      'Tasmania': 'TAS',
+      'Northern Territory': 'NT',
+      'Australian Capital Territory': 'ACT'
+    };
+  
+    // Setup color scale
+    const colorScale = d3.scaleSequential(d3.interpolateBlues);
+  
+    // SVG for the map
+    const svg = container.append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .style("display", "block")
+      .style("margin", "0 auto");
+  
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+    const projection = d3.geoMercator().fitSize([width, height], geoData);
     const path = d3.geoPath().projection(projection);
   
-    // Filter CSV data by year
-    const yearData = window.loadedDrugData.filter(d => d.Year === year);
+    const updateMap = (year) => {
+      currentYear = year;
   
-    // Map state to drug test total
-    const drugTestMap = {};
-    yearData.forEach(d => {
-      drugTestMap[d.Jurisdiction] = +d.TotalTests; // assume 'TotalTests' is a column
-    });
+      const yearData = data.filter(d => d.YEAR === year);
+      const totalMap = {};
+      yearData.forEach(d => {
+        totalMap[d.JURISDICTION] = +d.COUNT;
+      });
   
-    // Color scale
-    const maxValue = d3.max(Object.values(drugTestMap));
-    const color = d3.scaleSequential()
-      .domain([0, maxValue])
-      .interpolator(d3.interpolateBlues);
+      const maxVal = d3.max(Object.values(totalMap));
+      colorScale.domain([0, maxVal]);
   
-    // Draw map
-    svg.selectAll("path")
-      .data(window.ausGeoJSON.features)
-      .join("path")
-      .attr("d", path)
-      .attr("fill", d => {
-        const name = d.properties.STATE_NAME;
-        const value = drugTestMap[name];
-        return value ? color(value) : "#ccc";
-      })
-      .attr("stroke", "#fff");
-  }
+      g.selectAll("path")
+        .data(geoData.features)
+        .join("path")
+        .attr("d", path)
+        .attr("fill", d => {
+          const state = d.properties.STATE_NAME;
+          const code = stateNameToCode[state] || state;
+          const val = totalMap[code];
+          return val ? colorScale(val) : "#ccc";
+        })
+        .attr("stroke", "#fff");
+    };
+  
+    // Initial draw
+    updateMap(currentYear);
+  
+    // Legend (color scale) below the map, centered
+    const legendWidth = 350;
+    const legendHeight = 14;
+    const legendSvg = container.append("svg")
+      .attr("width", legendWidth + 40)
+      .attr("height", 50)
+      .style("display", "block")
+      .style("margin", "20px auto 0 auto");
+  
+    const legendG = legendSvg.append("g")
+      .attr("transform", "translate(20,20)");
+  
+    const defs = legendSvg.append("defs");
+    const linearGradient = defs.append("linearGradient")
+      .attr("id", "legend-gradient");
+  
+    linearGradient.selectAll("stop")
+      .data(d3.range(0, 1.01, 0.01))
+      .join("stop")
+      .attr("offset", d => `${d * 100}%`)
+      .attr("stop-color", d => colorScale(d * colorScale.domain()[1]));
+  
+    legendG.append("rect")
+      .attr("width", legendWidth)
+      .attr("height", legendHeight)
+      .style("fill", "url(#legend-gradient)");
+  
+    const legendScale = d3.scaleLinear()
+      .domain(colorScale.domain())
+      .range([0, legendWidth]);
+  
+    legendG.append("g")
+      .attr("transform", `translate(0,${legendHeight})`)
+      .call(d3.axisBottom(legendScale).ticks(5));
+  };
   
