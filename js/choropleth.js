@@ -104,7 +104,7 @@ window.renderChoropleth = function(data, geoData) {
       .style("margin", "20px auto 0 auto");
   
     const legendG = legendSvg.append("g")
-      .attr("transform", "translate(20,20)");
+      .attr("transform", "translate(20,0)");
   
     const defs = legendSvg.append("defs");
     const linearGradient = defs.append("linearGradient")
