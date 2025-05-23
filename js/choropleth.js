@@ -95,16 +95,16 @@ window.renderChoropleth = function(data, geoData) {
     updateMap(currentYear);
   
     // Legend (color scale) below the map, centered
-    const legendWidth = 350;
-    const legendHeight = 14;
+    const legendWidth = 600;
+    const legendHeight = 24;
     const legendSvg = container.append("svg")
       .attr("width", legendWidth + 40)
-      .attr("height", 50)
+      .attr("height", 60)
       .style("display", "block")
-      .style("margin", "0 auto 0 auto");
+      .style("margin", "-10px auto 0 auto");
   
     const legendG = legendSvg.append("g")
-      .attr("transform", "translate(20,0)");
+      .attr("transform", "translate(20,10)");
   
     const defs = legendSvg.append("defs");
     const linearGradient = defs.append("linearGradient")
