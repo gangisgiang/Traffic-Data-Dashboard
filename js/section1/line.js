@@ -55,7 +55,7 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
     .style("font-size", "11px");
   
   svg.append("g")
-    .call(d3.axisLeft(y).ticks(4).tickFormat(d => d >= 1000 ? d3.format(".0s")(d) : d))
+    .call(d3.axisLeft(y).tickValues([0, Math.round(maxValue/4), Math.round(maxValue/2), Math.round(maxValue*3/4), maxValue]).tickFormat(d => d >= 1000 ? d3.format(".0s")(d) : d))
     .selectAll("text")
     .style("fill", "#fff")
     .style("font-size", "11px");
