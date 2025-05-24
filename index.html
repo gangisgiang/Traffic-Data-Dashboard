@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="css/base.css"> -->
+    <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/styles.css">
     <title>Document</title>
 </head>
@@ -19,12 +19,27 @@
             <div id="choropleth" class="responsive-svg-container"></div>
             <div id="tooltip-linechart" class="tooltip-linechart"></div>
 
-            <p id="title">Positive Drug Tests</p>
+            <div id="section1-filters" class="filters">
+                <label for="year-filter">Year:</label>
+                <select id="year-filter"></select>
+                
+                <label for="age-filter">Age Group:</label>
+                <select id="age-filter"></select>
+                
+                <label for="location-filter">Location:</label>
+                <select id="location-filter"></select>
+                
+                <label for="jurisdiction-filter">Jurisdiction:</label>
+                <select id="jurisdiction-filter"></select>
+            </div>
+              
+            <p id="title">Bar Chart</p>
             <div id="positive-drug-bar-chart" class="responsive-svg-container"></div>
+
         </div>
-    <!-- <footer>
+    <footer>
         <p>Data Visualisation - Project</p>
-    </footer> -->
+    </footer>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="js/load-data.js"></script>
