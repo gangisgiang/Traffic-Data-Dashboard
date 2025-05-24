@@ -8,6 +8,12 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
   const totalData = window.sharedData.drugData.filter(d => d.JURISDICTION === jurisdictionCode);
   const positiveData = window.sharedData.positiveData.filter(d => d.JURISDICTION === jurisdictionCode);
 
+  // Debug: Log the data to see what's happening
+  console.log(`Jurisdiction: ${jurisdictionCode}`);
+  console.log('Total data sample:', totalData.slice(0, 3));
+  console.log('Positive data sample:', positiveData.slice(0, 3));
+  console.log('All positive data jurisdictions:', [...new Set(window.sharedData.positiveData.map(d => d.JURISDICTION))]);
+
   const years = d3.range(2008, 2024);
   const combined = years.map(year => {
     const totalRow = totalData.find(d => d.YEAR === year) || {};
@@ -19,17 +25,24 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
     };
   });
 
+  // Debug: Log combined data to see positive values
+  console.log('Combined data sample:', combined.slice(0, 5));
+
   const totalSum = d3.sum(combined, d => d.total);
-  const margin = { top: 10, right: 10, bottom: 25, left: 35 };
-  const width = 230;
-  const height = 120;
+  const positiveSum = d3.sum(combined, d => d.positive);
+  const margin = { top: 15, right: 15, bottom: 35, left: 50 };
+  const width = 280;
+  const height = 150;
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
+  // Title with jurisdiction and totals
   tooltip.append("div")
-    .style("margin-bottom", "4px")
+    .style("margin-bottom", "8px")
     .style("color", "white")
-    .html(`<strong>${jurisdictionCode}</strong>: ${d3.format(",")(totalSum)} total tests`);
+    .style("font-weight", "bold")
+    .style("text-align", "center")
+    .html(`${jurisdictionCode}`);
 
   const svg = tooltip.append("svg")
     .attr("width", width)
@@ -42,14 +55,20 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
     .domain([0, d3.max(combined, d => d.total)])
     .range([innerHeight, 0]);
 
-  // AREA = Positive
+  // FILLED AREA = Positive drug tests
   const area = d3.area()
     .x(d => x(d.year))
     .y0(innerHeight)
     .y1(d => y(d.positive))
     .curve(d3.curveMonotoneX);
 
-  // LINE = Total
+  svg.append("path")
+    .datum(combined)
+    .attr("fill", "#ff7f0e")
+    .attr("fill-opacity", 0.6)
+    .attr("d", area);
+
+  // LINE = Total drug tests
   const line = d3.line()
     .x(d => x(d.year))
     .y(d => y(d.total))
@@ -57,38 +76,57 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
 
   svg.append("path")
     .datum(combined)
-    .attr("fill", "#ff7f0e88")
-    .attr("d", area);
-
-  svg.append("path")
-    .datum(combined)
     .attr("fill", "none")
-    .attr("stroke", "white")
+    .attr("stroke", "#1f77b4")
     .attr("stroke-width", 2)
     .attr("d", line);
 
+  // X-axis
   svg.append("g")
     .attr("transform", `translate(0,${innerHeight})`)
     .call(d3.axisBottom(x).ticks(4).tickFormat(d3.format("d")))
-    .selectAll("text").attr("fill", "white");
+    .selectAll("text")
+    .attr("fill", "white")
+    .style("font-size", "10px");
 
+  // Y-axis
   svg.append("g")
-    .attr("transform", `translate(${innerWidth},0)`)
-    .call(d3.axisRight(y).ticks(4))
-    .selectAll("text").attr("fill", "white");
+    .call(d3.axisLeft(y).ticks(4).tickFormat(d3.format(".0s")))
+    .selectAll("text")
+    .attr("fill", "white")
+    .style("font-size", "10px");
 
-  svg.selectAll(".domain, .tick line").attr("stroke", "white");
+  // Style axis lines
+  svg.selectAll(".domain, .tick line").attr("stroke", "#ccc").attr("stroke-width", 1);
 
+  // X-axis label
   svg.append("text")
-    .attr("x", 0)
-    .attr("y", innerHeight + 20)
+    .attr("x", innerWidth / 2)
+    .attr("y", innerHeight + 30)
+    .attr("text-anchor", "middle")
     .text("Year")
-    .attr("fill", "white");
+    .attr("fill", "white")
+    .style("font-size", "11px");
 
+  // Y-axis label
   svg.append("text")
-    .attr("x", innerWidth)
-    .attr("y", -5)
-    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -innerHeight / 2)
+    .attr("y", -35)
+    .attr("text-anchor", "middle")
     .text("Number of Tests")
-    .attr("fill", "white");
+    .attr("fill", "white")
+    .style("font-size", "11px");
+
+  // Legend
+  const legend = tooltip.append("div")
+    .style("margin-top", "8px")
+    .style("font-size", "10px")
+    .style("color", "white");
+
+  legend.append("div")
+    .html(`<span style="color: #1f77b4; font-weight: bold;">—</span> Total drug tests: ${d3.format(",")(totalSum)}`);
+
+  legend.append("div")
+    .html(`<span style="color: #ff7f0e; font-weight: bold;">▉</span> Positive drug tests: ${d3.format(",")(positiveSum)}`);
 };
