@@ -8,4 +8,8 @@ Promise.all([
   if (window.renderChoropleth) {
     window.renderChoropleth(drugData, geoData);
   }
+  if (window.renderPositiveDrugBarChart) {
+    window.renderPositiveDrugBarChart(positiveData);
+  }
+  
 });
