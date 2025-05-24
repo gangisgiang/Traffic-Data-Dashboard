@@ -96,7 +96,7 @@ window.renderChoropleth = function(data, geoData) {
         const state = d.properties.STATE_NAME;
         const code = stateNameToCode[state] || state;
         if (window.showDrugTooltipChart) {
-          window.showDrugTooltipChart(code, [event.pageX, event.pageY]);
+          window.showDrugTooltipChart(code, [event.pageX, event.pageY], currentYear);
         }
       })
       .on("mouseout", function() {

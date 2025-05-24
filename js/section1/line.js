@@ -1,4 +1,4 @@
-window.showDrugTooltipChart = function(jurisdictionCode, position) {
+window.showDrugTooltipChart = function(jurisdictionCode, position, currentYear) {
   const tooltip = d3.select("#tooltip-linechart");
   tooltip.html("").style("display", "block")
          .style("left", `${position[0] + 10}px`)
@@ -6,6 +6,18 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
 
   const totalData = window.sharedData.drugData.filter(d => d.JURISDICTION === jurisdictionCode);
   const positiveData = window.sharedData.positiveData.filter(d => d.JURISDICTION === jurisdictionCode);
+
+  // Get the value for the current year
+  const currentYearData = totalData.find(d => d.YEAR === currentYear);
+  const currentYearValue = currentYearData ? +currentYearData.COUNT : 0;
+
+  // Add jurisdiction and current year value
+  tooltip.append("div")
+    .style("text-align", "center")
+    .style("font-weight", "bold")
+    .style("color", "#fff")
+    .style("font-size", "16px")
+    .text(`${jurisdictionCode}: ${d3.format(",")(currentYearValue)}`);
 
   const years = d3.range(2008, 2024);
   const combined = years.map(year => {
@@ -26,19 +38,19 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
   tooltip.append("div")
     .style("text-align", "center")
     .style("font-weight", "bold")
-    .style("margin-bottom", "15px")
+    .style("margin-top", "15px")
     .style("color", "#fff")
     .style("font-size", "14px")
-    .text(`${jurisdictionCode} - Drug Tests (2008-2023)`);
+    .text(`Drug Tests (2008-2023)`);
 
-  const margin = { top: 25, right: 25, bottom: 50, left: 40 };
-  const width = 310 - margin.left - margin.right;
-  const height = 200 - margin.top - margin.bottom;
+  const margin = { top: 25, right: 25, bottom: 50, left: 55 };
+  const width = 230 - margin.left - margin.right;
+  const height = 180 - margin.top - margin.bottom;
 
   const svg = tooltip.append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-    .style("margin-left", "-10px")
+    .style("margin-left", "-9px")
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -87,23 +99,45 @@ window.showDrugTooltipChart = function(jurisdictionCode, position) {
   svg.append("path")
     .datum(combined)
     .attr("fill", "none")
-    .attr("stroke", "#1f77b4")
+    .attr("stroke", "#42bcf5")
     .attr("stroke-width", 2)
     .attr("d", line);
 
+  // Add axis labels
+  // X-axis label
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 35)
+    .attr("text-anchor", "middle")
+    .style("fill", "#fff")
+    .style("font-size", "11px")
+    .text("Year");
+
+  // Y-axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -35)
+    .attr("text-anchor", "middle")
+    .style("fill", "#fff")
+    .style("font-size", "11px")
+    .style("margin-right", "10px")
+    .text("Total Tests");
+
   // Add legend
   const legend = tooltip.append("div")
-    .style("margin-top", "15px")
-    .style("font-size", "12px")
+    // .style("margin-top", "10px")
+    .style("font-size", "13px")
     .style("color", "#fff");
   
   const legendItems = legend.append("div")
-    .style("display", "flex")
-    .style("justify-content", "space-around");
+    .style("justify-content", "center")
+    .style("text-align", "center");
   
   legendItems.append("div")
     .html("── Total drug tests")
-    .style("color", "#1f77b4");
+    .style("color", "#42bcf5")
+    .style("margin-bottom", "3px");
   
   legendItems.append("div")
     .html("▬ Positive drug tests")
