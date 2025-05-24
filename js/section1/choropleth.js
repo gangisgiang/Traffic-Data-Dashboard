@@ -43,7 +43,6 @@ window.renderChoropleth = function(data, geoData) {
 
   // Setup color scale
   const colorScale = d3.scaleSequential(SHARED_CONSTANTS.colorScales.blueGradient);
-  
   // SVG for the map
   const svg = container.append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -79,7 +78,17 @@ window.renderChoropleth = function(data, geoData) {
         const val = totalMap[code];
         return val ? colorScale(val) : "#ccc";
       })
-      .attr("stroke", "#fff");
+      .attr("stroke", "#fff")
+      .on("mouseover", function(event, d) {
+        const state = d.properties.STATE_NAME;
+        const code = stateNameToCode[state] || state;
+        if (window.showDrugTooltipChart) {
+          window.showDrugTooltipChart(code, [event.pageX, event.pageY]);
+        }
+      })
+      .on("mouseout", function() {
+        d3.select("#tooltip-linechart").style("display", "none");
+      });
 
     // Add jurisdiction labels to the map
     g.selectAll("text")
@@ -144,6 +153,6 @@ window.renderChoropleth = function(data, geoData) {
     .attr("transform", `translate(0,${legendHeight})`)
     .call(d3.axisBottom(legendScale)
       .tickValues([0, 20000, 50000, 100000, 150000])
-      .tickFormat(SHARED_CONSTANTS.formatters.comma)
+      .tickFormat(d3.format(","))
     );
 };
