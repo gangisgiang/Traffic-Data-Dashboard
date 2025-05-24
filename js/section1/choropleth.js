@@ -68,9 +68,10 @@ window.renderChoropleth = function(data, geoData) {
     const maxVal = d3.max(Object.values(totalMap));
     colorScale.domain([0, maxVal]);
 
-    const paths = g.selectAll("path")
+    g.selectAll("path.state")
       .data(geoData.features)
       .join("path")
+      .attr("class", "state")
       .attr("d", path)
       .attr("fill", d => {
         const state = d.properties.STATE_NAME;
@@ -78,12 +79,12 @@ window.renderChoropleth = function(data, geoData) {
         const val = totalMap[code];
         return val ? colorScale(val) : "#ccc";
       })
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1)
+      .attr("stroke", "none")
       .on("mouseover", function(event, d) {
         d3.select(this)
           .attr("stroke", "#000")
-          .attr("stroke-width", 3); // bold black outline
+          .attr("stroke-width", 2)
+          .attr("filter", "drop-shadow(0 0 6px #fff)");
         const state = d.properties.STATE_NAME;
         const code = stateNameToCode[state] || state;
         if (window.showDrugTooltipChart) {
@@ -92,11 +93,11 @@ window.renderChoropleth = function(data, geoData) {
       })
       .on("mouseout", function() {
         d3.select(this)
-          .attr("stroke", "#fff")
-          .attr("stroke-width", 1); // reset
+          .attr("stroke", "none")
+          .attr("stroke-width", null)
+          .attr("filter", null);
         d3.select("#tooltip-linechart").style("display", "none");
       });
-
 
     // Add jurisdiction labels to the map
     g.selectAll("text")
