@@ -43,6 +43,7 @@ window.renderChoropleth = function(data, geoData) {
 
   // Setup color scale
   const colorScale = d3.scaleSequential(SHARED_CONSTANTS.colorScales.blueGradient);
+  
   // SVG for the map
   const svg = container.append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -143,7 +144,6 @@ window.renderChoropleth = function(data, geoData) {
     .attr("transform", `translate(0,${legendHeight})`)
     .call(d3.axisBottom(legendScale)
       .tickValues([0, 20000, 50000, 100000, 150000])
-      .tickFormat(d3.format(","))
+      .tickFormat(SHARED_CONSTANTS.formatters.comma)
     );
-  
 };
