@@ -68,7 +68,7 @@ window.renderChoropleth = function(data, geoData) {
     const maxVal = d3.max(Object.values(totalMap));
     colorScale.domain([0, maxVal]);
 
-    g.selectAll("path")
+    const paths = g.selectAll("path")
       .data(geoData.features)
       .join("path")
       .attr("d", path)
@@ -79,7 +79,11 @@ window.renderChoropleth = function(data, geoData) {
         return val ? colorScale(val) : "#ccc";
       })
       .attr("stroke", "#fff")
+      .attr("stroke-width", 1)
       .on("mouseover", function(event, d) {
+        d3.select(this)
+          .attr("stroke", "#000")
+          .attr("stroke-width", 3); // bold black outline
         const state = d.properties.STATE_NAME;
         const code = stateNameToCode[state] || state;
         if (window.showDrugTooltipChart) {
@@ -87,8 +91,12 @@ window.renderChoropleth = function(data, geoData) {
         }
       })
       .on("mouseout", function() {
+        d3.select(this)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 1); // reset
         d3.select("#tooltip-linechart").style("display", "none");
       });
+
 
     // Add jurisdiction labels to the map
     g.selectAll("text")
