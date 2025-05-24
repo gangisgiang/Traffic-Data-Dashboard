@@ -1,7 +1,7 @@
 window.renderChoropleth = function(data, geoData) {
   const margin = SHARED_CONSTANTS.defaultMargin;
-  const width = SHARED_CONSTANTS.defaultWidth - margin.left - margin.right;
-  const height = SHARED_CONSTANTS.defaultHeight - margin.top - margin.bottom;
+  const width = SHARED_CONSTANTS.defaultWidth + 200 - margin.left - margin.right;
+  const height = SHARED_CONSTANTS.defaultHeight + 200 - margin.top - margin.bottom;
 
   const container = d3.select("#choropleth");
   container.html(""); // clear previous
@@ -19,6 +19,16 @@ window.renderChoropleth = function(data, geoData) {
 
   const years = Array.from(new Set(data.map(d => d.YEAR))).sort();
   let currentYear = years[0];
+
+  // Set color scale domain for the initial year before drawing the legend
+  const initialYearData = data.filter(d => d.YEAR === currentYear);
+  const initialTotalMap = {};
+  initialYearData.forEach(d => {
+    initialTotalMap[d.JURISDICTION] = +d.COUNT;
+  });
+  const initialMaxVal = d3.max(Object.values(initialTotalMap));
+  const colorScale = d3.scaleSequential(SHARED_CONSTANTS.colorScales.blueGradient);
+  colorScale.domain([0, initialMaxVal]);
 
   slider.append("input")
     .attr("type", "range")
@@ -41,8 +51,6 @@ window.renderChoropleth = function(data, geoData) {
   // Map from full state name to code - shared-constants.js
   const stateNameToCode = SHARED_CONSTANTS.jurisdictionNameToCode;
 
-  // Setup color scale
-  const colorScale = d3.scaleSequential(SHARED_CONSTANTS.colorScales.blueGradient);
   // SVG for the map
   const svg = container.append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -114,7 +122,7 @@ window.renderChoropleth = function(data, geoData) {
       })
       .attr("text-anchor", "middle")
       .attr("alignment-baseline", "middle")
-      .attr("font-size", "12px")
+      .attr("font-size", "15px")
       .attr("font-family", "Roboto, Arial, sans-serif")
       .attr("font-weight", 400)
       .attr("stroke","#000")
@@ -134,7 +142,8 @@ window.renderChoropleth = function(data, geoData) {
     .attr("width", legendWidth + 40)
     .attr("height", 60)
     .style("display", "block")
-    .style("margin", "-10px auto 0 auto");
+    .style("margin", "-10px auto 0 auto")
+    .style("stroke", "none");
 
   const legendG = legendSvg.append("g")
     .attr("transform", "translate(20,10)");
@@ -158,10 +167,15 @@ window.renderChoropleth = function(data, geoData) {
     .domain([0, 170000])
     .range([0, legendWidth]);    
 
-  legendG.append("g")
+  const axisG = legendG.append("g")
     .attr("transform", `translate(0,${legendHeight})`)
     .call(d3.axisBottom(legendScale)
       .tickValues([0, 20000, 50000, 100000, 150000])
       .tickFormat(d3.format(","))
+      .tickSizeOuter(0)
     );
+    
+  axisG.select(".domain").remove();
+  axisG.selectAll(".tick line").attr("stroke", "#ccc");
+  axisG.selectAll(".tick text").attr("fill", "#666");
 };
