@@ -1,4 +1,4 @@
-YEAR,JURISDICTION,METRIC,COUNT
+"YEAR","JURISDICTION","METRIC","COUNT"
 2008,"NSW","drug_tests_conducted",20333
 2008,"QLD","drug_tests_conducted",10747
 2008,"SA","drug_tests_conducted",25903

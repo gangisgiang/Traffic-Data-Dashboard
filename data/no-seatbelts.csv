@@ -1,7 +1,4 @@
 "YEAR","START_DATE","END_DATE","JURISDICTION","LOCATION","AGE_GROUP","METRIC","DETECTION_METHOD","FINES"
-2017,"2017-01-01","2017-12-31","NSW","All regions","All ages","non_wearing_seatbelts","Police issued",22926
-2017,"2017-01-01","2017-12-31","NSW","All regions","All ages","non_wearing_seatbelts","Fixed or mobile camera",28
-2017,"2017-01-01","2017-12-31","WA","All regions","All ages","non_wearing_seatbelts","Police issued",7309
 2018,"2018-01-01","2018-12-31","ACT","All regions","All ages","non_wearing_seatbelts","Police issued",197
 2018,"2018-01-01","2018-12-31","NSW","All regions","All ages","non_wearing_seatbelts","Police issued",21538
 2018,"2018-01-01","2018-12-31","NSW","All regions","All ages","non_wearing_seatbelts","Fixed or mobile camera",15
