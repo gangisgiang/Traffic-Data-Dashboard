@@ -16,7 +16,6 @@ Used for crash consequences involving drugs or seatbelt violations
 
 This project was developed as part of a university coursework group by:
 
-Duong Ha Tien Le
-Uyen Giang Thai
+Duong Ha Tien Le and Uyen Giang Thai
 
 All group members contributed collaboratively to both data processing and web development.
